@@ -3,6 +3,8 @@ package com.yonagi.shortlink.admin.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.yonagi.shortlink.admin.common.convention.exception.ClientException;
+import com.yonagi.shortlink.admin.common.enums.UserErrorCodeEnum;
 import com.yonagi.shortlink.admin.dao.entity.UserDO;
 import com.yonagi.shortlink.admin.dao.mapper.UserMapper;
 import com.yonagi.shortlink.admin.dto.resp.UserRespDTO;
@@ -32,7 +34,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         UserDO userDO = baseMapper.selectOne(queryWrapper);
         UserRespDTO result = new UserRespDTO();
         if (userDO == null) {
-            return null;
+            throw new ClientException(UserErrorCodeEnum.USER_NOT_EXIST);
         } else {
             BeanUtils.copyProperties(userDO, result);
             return result;

@@ -1,6 +1,7 @@
 package com.yonagi.shortlink.admin.controller;
 
 import com.yonagi.shortlink.admin.common.convention.result.Result;
+import com.yonagi.shortlink.admin.common.convention.result.Results;
 import com.yonagi.shortlink.admin.dto.resp.UserRespDTO;
 import com.yonagi.shortlink.admin.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -27,11 +28,6 @@ public class UserController {
     @GetMapping("/api/shortlink/v1/user/{username}")
     public Result<UserRespDTO> getUserByUserName(@PathVariable("username") String userName) {
         UserRespDTO result = userService.getUserByUserName(userName);
-        if (result == null) {
-            return new Result<UserRespDTO>().setCode("-1").setMessage("用户查询为空");
-        } else {
-            return new Result<UserRespDTO>().setCode("0").setData(result);
-        }
-
+        return Results.success(result);
     }
 }
