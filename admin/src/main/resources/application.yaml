@@ -12,3 +12,8 @@ spring:
       idle-timeout: 30000
       maximum-pool-size: 5
       minimum-idle: 5
+  data:
+    redis:
+      host: 192.168.101.65
+      port: 6379
+      password: redis

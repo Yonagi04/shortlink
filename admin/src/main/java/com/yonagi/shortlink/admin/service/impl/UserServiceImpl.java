@@ -9,6 +9,8 @@ import com.yonagi.shortlink.admin.dao.entity.UserDO;
 import com.yonagi.shortlink.admin.dao.mapper.UserMapper;
 import com.yonagi.shortlink.admin.dto.resp.UserRespDTO;
 import com.yonagi.shortlink.admin.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.redisson.api.RBloomFilter;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +22,10 @@ import org.springframework.stereotype.Service;
  * @date 2024/08/13 10:56
  */
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements UserService {
+
+    private final RBloomFilter<String> userRegisterCachePenetrationBloomFilter;
 
     /**
      * 根据用户名查询用户
@@ -39,5 +44,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
             BeanUtils.copyProperties(userDO, result);
             return result;
         }
+    }
+
+    @Override
+    public Boolean hasUserName(String userName) {
+        return userRegisterCachePenetrationBloomFilter.contains(userName);
     }
 }
