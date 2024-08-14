@@ -1,5 +1,6 @@
 package com.yonagi.shortlink.admin.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -7,6 +8,7 @@ import com.yonagi.shortlink.admin.common.convention.exception.ClientException;
 import com.yonagi.shortlink.admin.common.enums.UserErrorCodeEnum;
 import com.yonagi.shortlink.admin.dao.entity.UserDO;
 import com.yonagi.shortlink.admin.dao.mapper.UserMapper;
+import com.yonagi.shortlink.admin.dto.req.UserRegisterReqDTO;
 import com.yonagi.shortlink.admin.dto.resp.UserRespDTO;
 import com.yonagi.shortlink.admin.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -46,8 +48,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         }
     }
 
+    /**
+     * 查询用户名是否存在
+     * @param userName
+     * @return true: 已经存在 false: 不存在
+     */
     @Override
     public Boolean hasUserName(String userName) {
         return userRegisterCachePenetrationBloomFilter.contains(userName);
+    }
+
+    /**
+     * 用户注册
+     * @param requestParam 注册用户的请求参数
+     */
+    @Override
+    public void register(UserRegisterReqDTO requestParam) {
+        if (hasUserName(requestParam.getUsername())) {
+            throw new ClientException(UserErrorCodeEnum.USER_NAME_EXIST);
+        }
+        int insert = baseMapper.insert(BeanUtil.toBean(requestParam, UserDO.class));
+        if (insert < 1) {
+            throw new ClientException(UserErrorCodeEnum.USER_SAVE_ERROR);
+        }
+        userRegisterCachePenetrationBloomFilter.add(requestParam.getUsername());
     }
 }

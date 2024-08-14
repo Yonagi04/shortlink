@@ -2,13 +2,11 @@ package com.yonagi.shortlink.admin.controller;
 
 import com.yonagi.shortlink.admin.common.convention.result.Result;
 import com.yonagi.shortlink.admin.common.convention.result.Results;
+import com.yonagi.shortlink.admin.dto.req.UserRegisterReqDTO;
 import com.yonagi.shortlink.admin.dto.resp.UserRespDTO;
 import com.yonagi.shortlink.admin.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author Yonagi
@@ -28,7 +26,7 @@ public class UserController {
      * @param userName
      * @return
      */
-    @GetMapping("/api/shortlink/v1/user/{username}")
+    @GetMapping("/api/short-link/v1/user/{username}")
     public Result<UserRespDTO> getUserByUserName(@PathVariable("username") String userName) {
         return Results.success(userService.getUserByUserName(userName));
     }
@@ -38,8 +36,19 @@ public class UserController {
      * @param userName
      * @return
      */
-    @GetMapping("/api/shortlink/v1/user/has-username")
+    @GetMapping("/api/short-link/v1/user/has-username")
     public Result<Boolean> hasUserName(@RequestParam("username") String userName) {
         return Results.success(userService.hasUserName(userName));
+    }
+
+    /**
+     * 注册用户
+     * @param requestParam
+     * @return
+     */
+    @PostMapping("/api/short-link/v1/user")
+    public Result<Void> register(@RequestBody UserRegisterReqDTO requestParam) {
+        userService.register(requestParam);
+        return Results.success();
     }
 }

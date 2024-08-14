@@ -2,6 +2,7 @@ package com.yonagi.shortlink.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.yonagi.shortlink.admin.dao.entity.UserDO;
+import com.yonagi.shortlink.admin.dto.req.UserRegisterReqDTO;
 import com.yonagi.shortlink.admin.dto.resp.UserRespDTO;
 
 /**
@@ -19,4 +20,17 @@ public interface UserService extends IService<UserDO> {
      * @return 用户实体UserRespDTO
      */
     UserRespDTO getUserByUserName(String userName);
+
+    /**
+     * 根据用户名查询用户名是否存在
+     * @param userName
+     * @return true: 已经存在 false: 不存在
+     */
+    Boolean hasUserName(String userName);
+
+    /**
+     * 用户注册
+     * @param requestParam 注册用户的请求参数
+     */
+    void register(UserRegisterReqDTO requestParam);
 }
