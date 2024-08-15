@@ -10,7 +10,7 @@ import lombok.Data;
  * @date 2024/08/15 16:19
  */
 @Data
-public class ShortLinkGroupSaveDTO {
+public class ShortLinkGroupSaveReqDTO {
 
     /**
      * 分组名称
