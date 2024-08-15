@@ -3,6 +3,7 @@ package com.yonagi.shortlink.admin.controller;
 import com.yonagi.shortlink.admin.common.convention.result.Result;
 import com.yonagi.shortlink.admin.common.convention.result.Results;
 import com.yonagi.shortlink.admin.dto.req.UserRegisterReqDTO;
+import com.yonagi.shortlink.admin.dto.req.UserUpdateReqDTO;
 import com.yonagi.shortlink.admin.dto.resp.UserRespDTO;
 import com.yonagi.shortlink.admin.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +50,17 @@ public class UserController {
     @PostMapping("/api/short-link/v1/user")
     public Result<Void> register(@RequestBody UserRegisterReqDTO requestParam) {
         userService.register(requestParam);
+        return Results.success();
+    }
+
+    /**
+     * 用户更新信息
+     * @param requestParam
+     * @return
+     */
+    @PutMapping("/api/short-link/v1/user")
+    public Result<Void> update(@RequestBody UserUpdateReqDTO requestParam) {
+        userService.update(requestParam);
         return Results.success();
     }
 }

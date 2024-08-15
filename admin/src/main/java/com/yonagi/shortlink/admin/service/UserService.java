@@ -3,6 +3,7 @@ package com.yonagi.shortlink.admin.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.yonagi.shortlink.admin.dao.entity.UserDO;
 import com.yonagi.shortlink.admin.dto.req.UserRegisterReqDTO;
+import com.yonagi.shortlink.admin.dto.req.UserUpdateReqDTO;
 import com.yonagi.shortlink.admin.dto.resp.UserRespDTO;
 
 /**
@@ -33,4 +34,10 @@ public interface UserService extends IService<UserDO> {
      * @param requestParam 注册用户的请求参数
      */
     void register(UserRegisterReqDTO requestParam);
+
+    /**
+     * 用户更新信息
+     * @param requestParam 更新信息的请求参数
+     */
+    void update(UserUpdateReqDTO requestParam);
 }
