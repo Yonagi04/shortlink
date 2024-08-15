@@ -2,8 +2,10 @@ package com.yonagi.shortlink.admin.controller;
 
 import com.yonagi.shortlink.admin.common.convention.result.Result;
 import com.yonagi.shortlink.admin.common.convention.result.Results;
+import com.yonagi.shortlink.admin.dto.req.UserLoginReqDTO;
 import com.yonagi.shortlink.admin.dto.req.UserRegisterReqDTO;
 import com.yonagi.shortlink.admin.dto.req.UserUpdateReqDTO;
+import com.yonagi.shortlink.admin.dto.resp.UserLoginRespDTO;
 import com.yonagi.shortlink.admin.dto.resp.UserRespDTO;
 import com.yonagi.shortlink.admin.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -61,6 +63,40 @@ public class UserController {
     @PutMapping("/api/short-link/v1/user")
     public Result<Void> update(@RequestBody UserUpdateReqDTO requestParam) {
         userService.update(requestParam);
+        return Results.success();
+    }
+
+    /**
+     * 用户登录
+     * @param requestParam
+     * @return 用户token
+     */
+    @PostMapping("/api/short-link/v1/user/login")
+    public Result<UserLoginRespDTO> login(@RequestBody UserLoginReqDTO requestParam) {
+        return Results.success(userService.login(requestParam));
+    }
+
+    /**
+     * 检查用户是否登录
+     * @param token
+     * @return
+     */
+    @GetMapping("/api/short-link/v1/user/check-login")
+    public Result<Boolean> checkLogin(@RequestParam("username") String username,
+                                      @RequestParam("token") String token) {
+        return Results.success(userService.checkLogin(username, token));
+    }
+
+    /**
+     * 用户登出
+     * @param username
+     * @param token
+     * @return
+     */
+    @DeleteMapping("/api/short-link/v1/user/logout")
+    public Result<Void> logout(@RequestParam("username") String username,
+                               @RequestParam("token") String token) {
+        userService.logout(username, token);
         return Results.success();
     }
 }
