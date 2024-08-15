@@ -11,4 +11,10 @@ import com.yonagi.shortlink.admin.dao.entity.GroupDO;
  * @date 2024/08/15 15:45
  */
 public interface GroupService extends IService<GroupDO> {
+
+    /**
+     * 新增短链接分组
+     * @param groupName 分组名称
+     */
+    void saveGroup(String groupName);
 }
