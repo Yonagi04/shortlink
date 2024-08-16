@@ -10,6 +10,9 @@ import com.yonagi.shortlink.admin.common.convention.errorcode.IErrorCode;
  * @date 2024/08/13 20:42
  */
 public enum UserErrorCodeEnum implements IErrorCode {
+
+    USER_TOKEN_FAIL("A000200", "用户token验证失败"),
+
     USER_NOT_EXIST("B000200", "用户记录不存在"),
 
     USER_NAME_EXIST("B000201", "用户名已存在"),
