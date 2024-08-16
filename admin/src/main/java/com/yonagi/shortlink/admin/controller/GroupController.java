@@ -3,6 +3,7 @@ package com.yonagi.shortlink.admin.controller;
 import com.yonagi.shortlink.admin.common.convention.result.Result;
 import com.yonagi.shortlink.admin.common.convention.result.Results;
 import com.yonagi.shortlink.admin.dto.req.ShortLinkGroupSaveReqDTO;
+import com.yonagi.shortlink.admin.dto.req.ShortLinkGroupSortReqDTO;
 import com.yonagi.shortlink.admin.dto.req.ShortLinkGroupUpdateReqDTO;
 import com.yonagi.shortlink.admin.dto.resp.ShortLinkGroupRespDTO;
 import com.yonagi.shortlink.admin.service.GroupService;
@@ -63,6 +64,17 @@ public class GroupController {
     @DeleteMapping("/api/short-link/v1/group")
     public Result<Void> delete(@RequestParam String gid) {
         groupService.deleteGroup(gid);
+        return Results.success();
+    }
+
+    /**
+     * 短链接分组排序
+     * @param requestParam 短链接分组排序请求参数
+     * @return
+     */
+    @PostMapping("/api/shortlink/v1/group/sort")
+    public Result<Void> sort(@RequestBody List<ShortLinkGroupSortReqDTO> requestParam) {
+        groupService.sortGroup(requestParam);
         return Results.success();
     }
 }
