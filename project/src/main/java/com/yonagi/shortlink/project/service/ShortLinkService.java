@@ -2,6 +2,8 @@ package com.yonagi.shortlink.project.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.yonagi.shortlink.project.dao.entity.ShortLinkDO;
+import com.yonagi.shortlink.project.dto.req.ShortLinkCreateReqDTO;
+import com.yonagi.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
 
 /**
  * @author Yonagi
@@ -11,4 +13,10 @@ import com.yonagi.shortlink.project.dao.entity.ShortLinkDO;
  * @date 2024/08/15 15:26
  */
 public interface ShortLinkService extends IService<ShortLinkDO> {
+
+    /**
+     * 创建短链接
+     * @param requestParam
+     */
+    ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO requestParam);
 }
