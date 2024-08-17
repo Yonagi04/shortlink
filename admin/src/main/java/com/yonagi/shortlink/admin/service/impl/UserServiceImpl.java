@@ -77,13 +77,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                     throw new ClientException(UserErrorCodeEnum.USER_SAVE_ERROR);
                 }
                 userRegisterCachePenetrationBloomFilter.add(requestParam.getUsername());
-                groupService.saveGroup("默认分组");
             } else {
                 throw new ClientException(UserErrorCodeEnum.USER_NAME_EXIST);
             }
         } finally {
             lock.unlock();
         }
+        groupService.saveGroup("默认分组", requestParam.getUsername());
     }
 
     @Override
