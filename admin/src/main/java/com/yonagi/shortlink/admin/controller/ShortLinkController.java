@@ -2,15 +2,15 @@ package com.yonagi.shortlink.admin.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yonagi.shortlink.admin.common.convention.result.Result;
-import com.yonagi.shortlink.admin.remote.dto.ShortLinkRemoteService;
+import com.yonagi.shortlink.admin.remote.ShortLinkRemoteService;
 import com.yonagi.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
 import com.yonagi.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
+import com.yonagi.shortlink.admin.remote.dto.resp.ShortLinkCountQueryRespDTO;
 import com.yonagi.shortlink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
 import com.yonagi.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @author Yonagi
@@ -29,7 +29,7 @@ public class ShortLinkController {
      * 创建短链接
      * @return
      */
-    @PostMapping("/api/short-link/v1/create")
+    @PostMapping("/api/short-link/admin/v1/create")
     public Result<ShortLinkCreateRespDTO> createShortLink(@RequestBody ShortLinkCreateReqDTO requestParam) {
         return shortLinkRemoteService.createShortLink(requestParam);
     }
@@ -42,5 +42,16 @@ public class ShortLinkController {
     @GetMapping("/api/short-link/admin/v1/page")
     public Result<IPage<ShortLinkPageRespDTO>> pageShortLink(ShortLinkPageReqDTO requestParam) {
         return shortLinkRemoteService.pageShortLink(requestParam);
+    }
+
+    /**
+     * 查询分组内短链接个数
+     * @param requestParam 分组gids
+     * @return gid和对应的短链接数
+     */
+    @GetMapping("/api/short-link/admin/v1/count")
+    public Result<List<ShortLinkCountQueryRespDTO>> listGroupShortLinkCount(@RequestParam("requestParam")
+                                                                                List<String> requestParam) {
+        return shortLinkRemoteService.listGroupShortLinkCount(requestParam);
     }
 }
