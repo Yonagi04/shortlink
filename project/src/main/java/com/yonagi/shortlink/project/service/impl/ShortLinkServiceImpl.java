@@ -1,11 +1,17 @@
 package com.yonagi.shortlink.project.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yonagi.shortlink.project.common.convention.exception.ServerException;
 import com.yonagi.shortlink.project.dao.entity.ShortLinkDO;
 import com.yonagi.shortlink.project.dao.mapper.ShortLinkMapper;
 import com.yonagi.shortlink.project.dto.req.ShortLinkCreateReqDTO;
+import com.yonagi.shortlink.project.dto.req.ShortLinkPageReqDTO;
 import com.yonagi.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
+import com.yonagi.shortlink.project.dto.resp.ShortLinkPageRespDTO;
 import com.yonagi.shortlink.project.service.ShortLinkService;
 import com.yonagi.shortlink.project.toolkit.HashUtil;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +54,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         try {
             baseMapper.insert(shortLinkDO);
         } catch (DuplicateKeyException e) {
-            /**
+            /*
              *  短链接不可能重复
              *  首先我们在构造短链接的时候，在原URL后面追加了一个当前毫秒数
              *  因此，对于不同时刻走到构造短链接这一行的多个线程，创建出来的短链接也应该是不同的，哪怕多个线程携带的原URL是相同的
@@ -83,5 +89,15 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             customGenerateCount++;
         }
         return shortUri;
+    }
+
+    @Override
+    public IPage<ShortLinkPageRespDTO> pageShortLink(ShortLinkPageReqDTO requestParam) {
+        LambdaQueryWrapper<ShortLinkDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
+                .eq(ShortLinkDO::getGid, requestParam.getGid())
+                .eq(ShortLinkDO::getEnableStatus, 0)
+                .eq(ShortLinkDO::getDelFlag, 0);
+        IPage<ShortLinkDO> resultPage = baseMapper.selectPage(requestParam, queryWrapper);
+        return resultPage.convert(each -> BeanUtil.toBean(each, ShortLinkPageRespDTO.class));
     }
 }
