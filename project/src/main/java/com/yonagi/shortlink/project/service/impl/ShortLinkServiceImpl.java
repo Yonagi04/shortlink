@@ -11,6 +11,8 @@ import com.yonagi.shortlink.project.common.convention.exception.ClientException;
 import com.yonagi.shortlink.project.common.convention.exception.ServerException;
 import com.yonagi.shortlink.project.common.enums.ValidDateTypeEnum;
 import com.yonagi.shortlink.project.dao.entity.ShortLinkDO;
+import com.yonagi.shortlink.project.dao.entity.ShortLinkGotoDO;
+import com.yonagi.shortlink.project.dao.mapper.ShortLinkGotoMapper;
 import com.yonagi.shortlink.project.dao.mapper.ShortLinkMapper;
 import com.yonagi.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import com.yonagi.shortlink.project.dto.req.ShortLinkPageReqDTO;
@@ -20,7 +22,10 @@ import com.yonagi.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
 import com.yonagi.shortlink.project.dto.resp.ShortLinkPageRespDTO;
 import com.yonagi.shortlink.project.service.ShortLinkService;
 import com.yonagi.shortlink.project.toolkit.HashUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBloomFilter;
 import org.springframework.dao.DuplicateKeyException;
@@ -44,6 +49,32 @@ import java.util.Objects;
 public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLinkDO> implements ShortLinkService {
 
     private final RBloomFilter<String> shortUriCreateCachePenetrationBloomFilter;
+    private final ShortLinkGotoMapper shortLinkGotoMapper;
+
+    @SneakyThrows
+    @Override
+    public void restoreUrl(String shortUri,
+                                           HttpServletRequest request,
+                                           HttpServletResponse response) {
+        String serverName = request.getServerName();
+        String fullShortUrl = serverName + "/" + shortUri;
+        LambdaQueryWrapper<ShortLinkGotoDO> linkGotoQueryWrapper = Wrappers.lambdaQuery(ShortLinkGotoDO.class)
+                .eq(ShortLinkGotoDO::getFullShortUrl, fullShortUrl);
+        ShortLinkGotoDO shortLinkGotoDO = shortLinkGotoMapper.selectOne(linkGotoQueryWrapper);
+        if (shortLinkGotoDO == null) {
+            // TODO 此处需要进行风控
+            return;
+        }
+        LambdaQueryWrapper<ShortLinkDO> shortLinkQueryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
+                .eq(ShortLinkDO::getGid, shortLinkGotoDO.getGid())
+                .eq(ShortLinkDO::getFullShortUrl, fullShortUrl)
+                .eq(ShortLinkDO::getDelFlag, 0)
+                .eq(ShortLinkDO::getEnableStatus, 0);
+        ShortLinkDO shortLinkDO = baseMapper.selectOne(shortLinkQueryWrapper);
+        if (shortLinkDO != null) {
+            response.sendRedirect(shortLinkDO.getOriginUrl());
+        }
+    }
 
     @Override
     public ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO requestParam) {
@@ -62,8 +93,13 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 .fullShortUrl(fullShortUrl)
                 .enableStatus(0)
                 .build();
+        ShortLinkGotoDO shortLinkGotoDO = ShortLinkGotoDO.builder()
+                .fullShortUrl(fullShortUrl)
+                .gid(requestParam.getGid())
+                .build();
         try {
             baseMapper.insert(shortLinkDO);
+            shortLinkGotoMapper.insert(shortLinkGotoDO);
         } catch (DuplicateKeyException e) {
             /*
              *  短链接不可能重复
@@ -76,9 +112,9 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             log.error("短链接: {}重复入库", fullShortUrl);
             throw new ServerException("短链接重复生成，请稍后再试");
         }
-        shortUriCreateCachePenetrationBloomFilter.add(shortLinkSuffix);
+        shortUriCreateCachePenetrationBloomFilter.add(fullShortUrl);
         return ShortLinkCreateRespDTO.builder()
-                .fullShortUrl(shortLinkDO.getFullShortUrl())
+                .fullShortUrl("http://" + shortLinkDO.getFullShortUrl())
                 .originUrl(requestParam.getOriginUrl())
                 .gid(requestParam.getGid())
                 .build();

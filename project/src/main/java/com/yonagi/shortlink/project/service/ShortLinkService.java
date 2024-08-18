@@ -9,6 +9,8 @@ import com.yonagi.shortlink.project.dto.req.ShortLinkUpdateReqDTO;
 import com.yonagi.shortlink.project.dto.resp.ShortLinkCountQueryRespDTO;
 import com.yonagi.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
 import com.yonagi.shortlink.project.dto.resp.ShortLinkPageRespDTO;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.List;
 
@@ -20,6 +22,14 @@ import java.util.List;
  * @date 2024/08/15 15:26
  */
 public interface ShortLinkService extends IService<ShortLinkDO> {
+
+    /**
+     * 短链接跳转
+     * @param shortUri 短链接
+     * @param request 请求
+     * @param response 响应
+     */
+    void restoreUrl(String shortUri, HttpServletRequest request, HttpServletResponse response);
 
     /**
      * 创建短链接
