@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yonagi.shortlink.admin.common.convention.result.Result;
 import com.yonagi.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
 import com.yonagi.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
+import com.yonagi.shortlink.admin.remote.dto.req.ShortLinkUpdateReqDTO;
 import com.yonagi.shortlink.admin.remote.dto.resp.ShortLinkCountQueryRespDTO;
 import com.yonagi.shortlink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
 import com.yonagi.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
@@ -61,5 +62,14 @@ public interface ShortLinkRemoteService {
         String resultStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/v1/count", requestMap);
         return JSON.parseObject(resultStr, new TypeReference<>() {
         });
+    }
+
+    /**
+     * 修改短链接
+     * @param requestParam 短链接修改请求参数
+     */
+    default void updateShortLink(ShortLinkUpdateReqDTO requestParam) {
+        String resultStr = HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/update",
+                JSON.toJSONString(requestParam));
     }
 }

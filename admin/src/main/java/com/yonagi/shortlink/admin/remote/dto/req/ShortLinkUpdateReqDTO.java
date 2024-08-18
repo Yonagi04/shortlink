@@ -1,4 +1,4 @@
-package com.yonagi.shortlink.project.dto.req;
+package com.yonagi.shortlink.admin.remote.dto.req;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
@@ -9,17 +9,11 @@ import java.util.Date;
  * @author Yonagi
  * @version 1.0
  * @program shortlink
- * @description 短链接创建请求参数
- * @date 2024/08/16 12:45
+ * @description 短链接修改请求参数
+ * @date 2024/08/18 08:34
  */
-
 @Data
-public class ShortLinkCreateReqDTO {
-
-    /**
-     * 域名
-     */
-    private String domain;
+public class ShortLinkUpdateReqDTO {
 
     /**
      * 原始链接
@@ -27,14 +21,14 @@ public class ShortLinkCreateReqDTO {
     private String originUrl;
 
     /**
+     * 完整短链接
+     */
+    private String fullShortUrl;
+
+    /**
      * 分组标识
      */
     private String gid;
-
-    /**
-     * 创建类型 0：接口创建 1：控制台创建
-     */
-    private Integer createType;
 
     /**
      * 有效期类型 0：永久有效 1：自定义
