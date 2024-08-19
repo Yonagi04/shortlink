@@ -112,25 +112,23 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     .eq(ShortLinkDO::getDelFlag, 0)
                     .eq(ShortLinkDO::getEnableStatus, 0);
             ShortLinkDO shortLinkDO = baseMapper.selectOne(shortLinkQueryWrapper);
-            if (shortLinkDO != null) {
-                if (shortLinkDO.getValidDate() != null && shortLinkDO.getValidDate().before(new Date())) {
-                    stringRedisTemplate.opsForValue().set(
-                            String.format(RedisKeyConstant.GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl),
-                            "-",
-                            30,
-                            TimeUnit.MINUTES
-                    );
-                    response.sendRedirect("/page/404");
-                    return;
-                }
+            if (shortLinkDO == null || (shortLinkDO.getValidDate() != null && shortLinkDO.getValidDate().before(new Date()))) {
                 stringRedisTemplate.opsForValue().set(
-                        String.format(RedisKeyConstant.GOTO_SHORT_LINK_KEY, fullShortUrl),
-                        shortLinkDO.getOriginUrl(),
-                        LinkUtil.getLinkCacheValidDate(shortLinkDO.getValidDate()),
-                        TimeUnit.MILLISECONDS
+                        String.format(RedisKeyConstant.GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl),
+                        "-",
+                        30,
+                        TimeUnit.MINUTES
                 );
-                response.sendRedirect(shortLinkDO.getOriginUrl());
+                response.sendRedirect("/page/404");
+                return;
             }
+            stringRedisTemplate.opsForValue().set(
+                    String.format(RedisKeyConstant.GOTO_SHORT_LINK_KEY, fullShortUrl),
+                    shortLinkDO.getOriginUrl(),
+                    LinkUtil.getLinkCacheValidDate(shortLinkDO.getValidDate()),
+                    TimeUnit.MILLISECONDS
+            );
+            response.sendRedirect(shortLinkDO.getOriginUrl());
         } finally {
             lock.unlock();
         }
@@ -138,7 +136,6 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
     @Override
     public ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO requestParam) {
-        // TODO 对于已经创建过短链接的URL，我们希望不要重复创建
         String shortLinkSuffix = generateSuffix(requestParam);
         String fullShortUrl = requestParam.getDomain() + "/" + shortLinkSuffix;
         ShortLinkDO shortLinkDO = ShortLinkDO.builder()

@@ -5,6 +5,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yonagi.shortlink.admin.common.convention.result.Result;
+import com.yonagi.shortlink.admin.remote.dto.req.RecycleBinSaveReqDTO;
 import com.yonagi.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
 import com.yonagi.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
 import com.yonagi.shortlink.admin.remote.dto.req.ShortLinkUpdateReqDTO;
@@ -82,5 +83,16 @@ public interface ShortLinkRemoteService {
         String resultStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/v1/title?url=" + url);
         return JSON.parseObject(resultStr, new TypeReference<>() {
         });
+    }
+
+    /**
+     * 保存回收站
+     * @param requestParam 保存回收站请求参数
+     * @return
+     */
+    default void saveRecycleBin(RecycleBinSaveReqDTO requestParam) {
+        String resultStr = HttpUtil.post("http://127.0.0.1:8001/api/short-link/admin/v1/recycle-bin/save",
+                JSON.toJSONString(requestParam));
+
     }
 }
