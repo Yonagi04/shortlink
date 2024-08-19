@@ -73,11 +73,13 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             return;
         }
         if (!shortUriCreateCachePenetrationBloomFilter.contains(fullShortUrl)) {
+            response.sendRedirect("/page/404");
             return;
         }
         String gotoIsNullShortLink = stringRedisTemplate.opsForValue()
                 .get(String.format(RedisKeyConstant.GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl));
         if (StrUtil.isNotBlank(gotoIsNullShortLink)) {
+            response.sendRedirect("/page/404");
             return;
         }
         RLock lock = redissonClient.getLock(String.format(RedisKeyConstant.LOCK_GOTO_SHORT_LINK_KEY, fullShortUrl));
@@ -96,6 +98,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 stringRedisTemplate.opsForValue()
                         .set(String.format(RedisKeyConstant.GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl),
                                 "-", 30, TimeUnit.MINUTES);
+                response.sendRedirect("/page/404");
                 return;
             }
             LambdaQueryWrapper<ShortLinkDO> shortLinkQueryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
@@ -112,6 +115,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                             30,
                             TimeUnit.MINUTES
                     );
+                    response.sendRedirect("/page/404");
                     return;
                 }
                 stringRedisTemplate.opsForValue().set(
