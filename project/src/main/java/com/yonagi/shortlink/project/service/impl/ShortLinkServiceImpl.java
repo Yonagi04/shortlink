@@ -24,6 +24,7 @@ import com.yonagi.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
 import com.yonagi.shortlink.project.dto.resp.ShortLinkPageRespDTO;
 import com.yonagi.shortlink.project.service.ShortLinkService;
 import com.yonagi.shortlink.project.toolkit.HashUtil;
+import com.yonagi.shortlink.project.toolkit.LinkUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -148,6 +149,12 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             log.error("短链接: {}重复入库", fullShortUrl);
             throw new ServerException("短链接重复生成，请稍后再试");
         }
+        stringRedisTemplate.opsForValue().set(
+                fullShortUrl,
+                requestParam.getOriginUrl(),
+                LinkUtil.getLinkCacheValidDate(requestParam.getValidDate()),
+                TimeUnit.MILLISECONDS
+        );
         shortUriCreateCachePenetrationBloomFilter.add(fullShortUrl);
         return ShortLinkCreateRespDTO.builder()
                 .fullShortUrl("http://" + shortLinkDO.getFullShortUrl())
