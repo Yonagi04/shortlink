@@ -4,12 +4,16 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yonagi.shortlink.admin.common.convention.result.Result;
 import com.yonagi.shortlink.admin.common.convention.result.Results;
 import com.yonagi.shortlink.admin.remote.ShortLinkRemoteService;
+import com.yonagi.shortlink.admin.remote.dto.req.RecycleBinRecoverReqDTO;
 import com.yonagi.shortlink.admin.remote.dto.req.RecycleBinSaveReqDTO;
 import com.yonagi.shortlink.admin.remote.dto.req.ShortLinkRecycleBinPageReqDTO;
 import com.yonagi.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
 import com.yonagi.shortlink.admin.service.RecycleBinService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Yonagi
@@ -45,5 +49,16 @@ public class RecycleBinController {
     @GetMapping("/api/short-link/admin/v1/recycle-bin/page")
     public Result<IPage<ShortLinkPageRespDTO>> pageShortLink(ShortLinkRecycleBinPageReqDTO requestParam) {
         return recycleBinService.pageShortLinkForRecycleBin(requestParam);
+    }
+
+    /**
+     * 恢复回收站
+     * @param requestParam 恢复回收站请求参数
+     * @return
+     */
+    @PostMapping("/api/short-link/admin/v1/recycle-bin/recover")
+    public Result<Void> recoverRecycleBin(@RequestBody RecycleBinRecoverReqDTO requestParam) {
+        shortLinkRemoteService.recoverRecycleBin(requestParam);
+        return Results.success();
     }
 }
