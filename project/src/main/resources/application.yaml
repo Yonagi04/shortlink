@@ -2,6 +2,8 @@ server:
   port: 8001
 
 spring:
+  config:
+    import: optional:classpath:/application.dev.yaml
   datasource:
     url: jdbc:shardingsphere:classpath:shardingsphere-config.yaml
     driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
