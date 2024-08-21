@@ -3,6 +3,7 @@ package com.yonagi.shortlink.project.toolkit;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import com.yonagi.shortlink.project.common.constant.ShortLinkConstant;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.Date;
 import java.util.Optional;
@@ -25,5 +26,26 @@ public class LinkUtil {
         return Optional.ofNullable(validDate)
                 .map(each -> DateUtil.between(new Date(), each, DateUnit.MS))
                 .orElse(ShortLinkConstant.DEFAULT_CACHE_VALID_TIME);
+    }
+
+    /**
+     * 获取http请求的真实ip地址
+     * @param request http请求
+     * @return ip地址
+     */
+    public static String getIp(HttpServletRequest request) {
+        String ipAddress = request.getHeader("X-Forwarded-For");
+
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getHeader("Proxy-Client-IP");
+        }
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getRemoteAddr();
+        }
+
+        return ipAddress;
     }
 }
