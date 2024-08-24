@@ -20,14 +20,8 @@ import com.yonagi.shortlink.project.common.constant.ShortLinkConstant;
 import com.yonagi.shortlink.project.common.convention.exception.ClientException;
 import com.yonagi.shortlink.project.common.convention.exception.ServerException;
 import com.yonagi.shortlink.project.common.enums.ValidDateTypeEnum;
-import com.yonagi.shortlink.project.dao.entity.LinkAccessStatsDO;
-import com.yonagi.shortlink.project.dao.entity.LinkLocaleStatsDO;
-import com.yonagi.shortlink.project.dao.entity.ShortLinkDO;
-import com.yonagi.shortlink.project.dao.entity.ShortLinkGotoDO;
-import com.yonagi.shortlink.project.dao.mapper.LinkAccessStatsMapper;
-import com.yonagi.shortlink.project.dao.mapper.LinkLocaleStatsMapper;
-import com.yonagi.shortlink.project.dao.mapper.ShortLinkGotoMapper;
-import com.yonagi.shortlink.project.dao.mapper.ShortLinkMapper;
+import com.yonagi.shortlink.project.dao.entity.*;
+import com.yonagi.shortlink.project.dao.mapper.*;
 import com.yonagi.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import com.yonagi.shortlink.project.dto.req.ShortLinkPageReqDTO;
 import com.yonagi.shortlink.project.dto.req.ShortLinkUpdateReqDTO;
@@ -79,6 +73,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private final RedissonClient redissonClient;
     private final LinkAccessStatsMapper linkAccessStatsMapper;
     private final LinkLocaleStatsMapper linkLocaleStatsMapper;
+    private final LinkOSStatsMapper linkOSStatsMapper;
 
     @Value("${short-link.stats.locale.amap-key}")
     private String statsLocaleAmapKey;
@@ -225,6 +220,15 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                         .build();
                 linkLocaleStatsMapper.shortLinkLocaleStats(linkLocaleStatsDO);
             }
+
+            LinkOSStatsDO linkOSStatsDO = LinkOSStatsDO.builder()
+                    .fullShortUrl(fullShortUrl)
+                    .gid(gid)
+                    .cnt(1)
+                    .os(LinkUtil.getOs(request))
+                    .date(new Date())
+                    .build();
+            linkOSStatsMapper.shortlinkOsStats(linkOSStatsDO);
         } catch (Throwable e) {
             log.error("短链接统计异常", e);
         }
