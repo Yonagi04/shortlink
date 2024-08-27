@@ -6,9 +6,7 @@ import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yonagi.shortlink.admin.common.convention.result.Result;
 import com.yonagi.shortlink.admin.remote.dto.req.*;
-import com.yonagi.shortlink.admin.remote.dto.resp.ShortLinkCountQueryRespDTO;
-import com.yonagi.shortlink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
-import com.yonagi.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
+import com.yonagi.shortlink.admin.remote.dto.resp.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -124,5 +122,37 @@ public interface ShortLinkRemoteService {
     default void deleteRecycleBin(RecycleBinDeleteReqDTO requestParam) {
         HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/recycle-bin/remove",
                 JSON.toJSONString(requestParam));
+    }
+
+    /**
+     * 访问单个短链接指定时间内的监控数据
+     * @param requestParam
+     * @return
+     */
+    default ShortLinkStatsRespDTO oneShortLinkStats(ShortLinkStatsReqDTO requestParam) {
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("fullShortUrl", requestParam.getFullShortUrl());
+        requestMap.put("gid", requestParam.getGid());
+        requestMap.put("startDate", requestParam.getStartDate());
+        requestMap.put("endDate", requestParam.getEndDate());
+        String resultStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/v1/stats", requestMap);
+        return JSON.parseObject(resultStr, new TypeReference<>() {
+        });
+    }
+
+    /**
+     * 访问单个短链接指定时间内访问记录的监控数据
+     * @param requestParam
+     * @return
+     */
+    default IPage<ShortLinkStatsAccessRecordRespDTO> oneShortLinkStatsAccessRecord(ShortLinkStatsAccessRecordReqDTO requestParam) {
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("fullShortUrl", requestParam.getFullShortUrl());
+        requestMap.put("gid", requestParam.getGid());
+        requestMap.put("startDate", requestParam.getStartDate());
+        requestMap.put("endDate", requestParam.getEndDate());
+        String resultStr = HttpUtil.get("127.0.0.1:8001/api/short-link/v1/stats/access-record", requestMap);
+        return JSON.parseObject(resultStr, new TypeReference<>() {
+        });
     }
 }
