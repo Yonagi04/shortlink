@@ -54,6 +54,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author Yonagi
@@ -75,6 +76,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private final LinkLocaleStatsMapper linkLocaleStatsMapper;
     private final LinkOSStatsMapper linkOSStatsMapper;
     private final LinkBrowserStatsMapper linkBrowserStatsMapper;
+    private final LinkAccessLogsMapper linkAccessLogsMapper;
 
     @Value("${short-link.stats.locale.amap-key}")
     private String statsLocaleAmapKey;
@@ -152,14 +154,15 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
     private void shortLinkStats(String fullShortUrl, String gid, HttpServletRequest request, HttpServletResponse response) {
         AtomicBoolean uvFirstFlag = new AtomicBoolean();
+        AtomicReference<String> uv = new AtomicReference<>();
         Runnable addResponseCookieTask = () -> {
-            String uvFlag = UUID.fastUUID().toString();
-            Cookie uvCookie = new Cookie("uv", uvFlag);
+            uv.set(UUID.fastUUID().toString());
+            Cookie uvCookie = new Cookie("uv", uv.get());
             uvCookie.setMaxAge(60 * 60 * 24 * 30);
             uvCookie.setPath(StrUtil.sub(fullShortUrl, fullShortUrl.indexOf("/"), fullShortUrl.length()));
             response.addCookie(uvCookie);
             uvFirstFlag.set(Boolean.TRUE);
-            stringRedisTemplate.opsForSet().add(RedisKeyConstant.UV_SHORT_LINK_KEY + fullShortUrl, uvFlag);
+            stringRedisTemplate.opsForSet().add(RedisKeyConstant.UV_SHORT_LINK_KEY + fullShortUrl, uv.get());
         };
         try {
             if (ArrayUtil.isNotEmpty(request.getCookies())) {
@@ -168,6 +171,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                         .findFirst()
                         .map(Cookie::getValue)
                         .ifPresentOrElse(each -> {
+                            uv.set(each);
                             Long uvAdded = stringRedisTemplate.opsForSet().add(RedisKeyConstant.UV_SHORT_LINK_KEY + fullShortUrl, each);
                             uvFirstFlag.set(uvAdded != null && uvAdded > 0L);
                         }, addResponseCookieTask);
@@ -237,6 +241,15 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     .browser(LinkUtil.getBrowser(request))
                     .build();
             linkBrowserStatsMapper.shortlinkBrowserStats(linkBrowserStatsDO);
+            LinkAccessLogsDO linkAccessLogsDO = LinkAccessLogsDO.builder()
+                    .user(uv.get())
+                    .ip(remoteAddr)
+                    .browser(LinkUtil.getBrowser(request))
+                    .os(LinkUtil.getOs(request))
+                    .gid(gid)
+                    .fullShortUrl(fullShortUrl)
+                    .build();
+            linkAccessLogsMapper.insert(linkAccessLogsDO);
         } catch (Throwable e) {
             log.error("短链接统计异常", e);
         }
