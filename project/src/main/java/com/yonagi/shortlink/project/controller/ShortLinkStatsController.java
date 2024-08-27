@@ -1,8 +1,11 @@
 package com.yonagi.shortlink.project.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yonagi.shortlink.project.common.convention.result.Result;
 import com.yonagi.shortlink.project.common.convention.result.Results;
+import com.yonagi.shortlink.project.dto.req.ShortLinkStatsAccessRecordReqDTO;
 import com.yonagi.shortlink.project.dto.req.ShortLinkStatsReqDTO;
+import com.yonagi.shortlink.project.dto.resp.ShortLinkStatsAccessRecordRespDTO;
 import com.yonagi.shortlink.project.dto.resp.ShortLinkStatsRespDTO;
 import com.yonagi.shortlink.project.service.ShortLinkStatsService;
 import lombok.RequiredArgsConstructor;
@@ -31,5 +34,15 @@ public class ShortLinkStatsController {
     public Result<ShortLinkStatsRespDTO> shortLinkStats(ShortLinkStatsReqDTO requestParam) {
 
         return Results.success(shortLinkStatsService.oneShortLinkStats(requestParam));
+    }
+
+    /**
+     * 访问单个短链接指定时间内访问记录的监控数据
+     * @param requestParam
+     * @return
+     */
+    @GetMapping("/api/short-link/v1/stats/access-record")
+    public Result<IPage<ShortLinkStatsAccessRecordRespDTO>> shortLinkStatsAccessRecord(ShortLinkStatsAccessRecordReqDTO requestParam) {
+        return Results.success(shortLinkStatsService.oneShortLinkStatsAccessRecord(requestParam));
     }
 }

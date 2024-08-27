@@ -1,6 +1,9 @@
 package com.yonagi.shortlink.project.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.yonagi.shortlink.project.dto.req.ShortLinkStatsAccessRecordReqDTO;
 import com.yonagi.shortlink.project.dto.req.ShortLinkStatsReqDTO;
+import com.yonagi.shortlink.project.dto.resp.ShortLinkStatsAccessRecordRespDTO;
 import com.yonagi.shortlink.project.dto.resp.ShortLinkStatsRespDTO;
 
 /**
@@ -18,4 +21,11 @@ public interface ShortLinkStatsService {
      * @return
      */
     ShortLinkStatsRespDTO oneShortLinkStats(ShortLinkStatsReqDTO requestParam);
+
+    /**
+     * 访问单个短链接指定时间内访问记录的监控数据
+     * @param requestParam
+     * @return
+     */
+    IPage<ShortLinkStatsAccessRecordRespDTO> oneShortLinkStatsAccessRecord(ShortLinkStatsAccessRecordReqDTO requestParam);
 }
