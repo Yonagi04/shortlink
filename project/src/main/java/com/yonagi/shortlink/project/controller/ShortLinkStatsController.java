@@ -3,6 +3,7 @@ package com.yonagi.shortlink.project.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yonagi.shortlink.project.common.convention.result.Result;
 import com.yonagi.shortlink.project.common.convention.result.Results;
+import com.yonagi.shortlink.project.dto.req.ShortLinkGroupStatsReqDTO;
 import com.yonagi.shortlink.project.dto.req.ShortLinkStatsAccessRecordReqDTO;
 import com.yonagi.shortlink.project.dto.req.ShortLinkStatsReqDTO;
 import com.yonagi.shortlink.project.dto.resp.ShortLinkStatsAccessRecordRespDTO;
@@ -34,6 +35,17 @@ public class ShortLinkStatsController {
     public Result<ShortLinkStatsRespDTO> shortLinkStats(ShortLinkStatsReqDTO requestParam) {
 
         return Results.success(shortLinkStatsService.oneShortLinkStats(requestParam));
+    }
+
+    /**
+     * 访问分组短链接指定时间内的监控数据
+     * @param requestParam
+     * @return
+     */
+    @GetMapping("/api/short-link/v1/stats/group")
+    public Result<ShortLinkStatsRespDTO> groupShortLinkStats(ShortLinkGroupStatsReqDTO requestParam) {
+
+        return Results.success(shortLinkStatsService.groupShortLinkStats(requestParam));
     }
 
     /**
