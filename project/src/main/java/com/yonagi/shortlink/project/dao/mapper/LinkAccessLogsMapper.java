@@ -2,6 +2,7 @@ package com.yonagi.shortlink.project.dao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.yonagi.shortlink.project.dao.entity.LinkAccessLogsDO;
+import com.yonagi.shortlink.project.dao.entity.LinkAccessStatsDO;
 import com.yonagi.shortlink.project.dto.req.ShortLinkStatsAccessRecordReqDTO;
 import com.yonagi.shortlink.project.dto.req.ShortLinkStatsReqDTO;
 import org.apache.ibatis.annotations.Param;
@@ -93,4 +94,23 @@ public interface LinkAccessLogsMapper extends BaseMapper<LinkAccessLogsDO> {
                                                  @Param("startDate") String startDate,
                                                  @Param("endDate") String endDate,
                                                  @Param("userAccessLogList") List<String> userAccessLogList);
+
+    /**
+     * 根据短链接获取指定日期内pv,uv,uip数据
+     * @param requestParam
+     * @return
+     */
+    @Select("SELECT " +
+            "   COUNT(user) AS pv," +
+            "   COUNT(DISTINCT user) as uv," +
+            "   COUNT(DISTINCT ip) as uip " +
+            "FROM " +
+            "   t_link_access_logs " +
+            "WHERE " +
+            "    full_short_url = #{param.fullShortUrl} " +
+            "    AND gid = #{param.gid} " +
+            "    AND create_time BETWEEN #{param.startDate} and #{param.endDate} " +
+            "GROUP BY " +
+            "    full_short_url, gid;")
+    LinkAccessStatsDO findUvPvUipStatsByShortLink(@Param("param") ShortLinkStatsReqDTO requestParam);
 }
