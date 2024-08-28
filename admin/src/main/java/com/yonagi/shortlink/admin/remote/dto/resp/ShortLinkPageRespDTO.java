@@ -71,4 +71,34 @@ public class ShortLinkPageRespDTO {
      * 网站标识
      */
     private String favicon;
+
+    /**
+     * 历史uv
+     */
+    private Integer totalUv;
+
+    /**
+     * 历史pv
+     */
+    private Integer totalPv;
+
+    /**
+     * 历史uip
+     */
+    private Integer totalUip;
+
+    /**
+     * 今日uv
+     */
+    private Integer todayUv;
+
+    /**
+     * 今日pv
+     */
+    private Integer todayPv;
+
+    /**
+     * 今日uip
+     */
+    private Integer todayUip;
 }
