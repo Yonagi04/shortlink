@@ -115,6 +115,39 @@ public interface LinkAccessLogsMapper extends BaseMapper<LinkAccessLogsDO> {
                                                  @Param("userAccessLogList") List<String> userAccessLogList);
 
     /**
+     * 判断分组用户信息是否是老访客
+     * @param fullShortUrl
+     * @param gid
+     * @param startDate
+     * @param endDate
+     * @param userAccessLogList
+     * @return
+     */
+    @Select("<script> " +
+            "SELECT " +
+            "    user, " +
+            "    CASE " +
+            "        WHEN MIN(create_time) BETWEEN #{startDate} AND #{endDate} THEN '新访客' " +
+            "        ELSE '老访客' " +
+            "    END AS uvType " +
+            "FROM " +
+            "    t_link_access_logs " +
+            "WHERE " +
+            "    gid = #{gid} " +
+            "    AND user IN " +
+            "    <foreach item='item' index='index' collection='userAccessLogList' open='(' separator=',' close=')'> " +
+            "        #{item} " +
+            "    </foreach> " +
+            "GROUP BY " +
+            "    user;" +
+            "    </script>"
+    )
+    List<Map<String, Object>> selectGroupUvTypeByUser(@Param("gid") String gid,
+                                                      @Param("startDate") String startDate,
+                                                      @Param("endDate") String endDate,
+                                                      @Param("userAccessLogList") List<String> userAccessLogsList);
+
+    /**
      * 根据短链接获取指定日期内pv,uv,uip数据
      * @param requestParam
      * @return
