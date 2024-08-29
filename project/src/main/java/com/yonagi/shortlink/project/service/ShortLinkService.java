@@ -3,9 +3,11 @@ package com.yonagi.shortlink.project.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.yonagi.shortlink.project.dao.entity.ShortLinkDO;
+import com.yonagi.shortlink.project.dto.req.ShortLinkBatchCreateReqDTO;
 import com.yonagi.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import com.yonagi.shortlink.project.dto.req.ShortLinkPageReqDTO;
 import com.yonagi.shortlink.project.dto.req.ShortLinkUpdateReqDTO;
+import com.yonagi.shortlink.project.dto.resp.ShortLinkBatchCreateRespDTO;
 import com.yonagi.shortlink.project.dto.resp.ShortLinkCountQueryRespDTO;
 import com.yonagi.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
 import com.yonagi.shortlink.project.dto.resp.ShortLinkPageRespDTO;
@@ -36,6 +38,13 @@ public interface ShortLinkService extends IService<ShortLinkDO> {
      * @param requestParam
      */
     ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO requestParam);
+
+    /**
+     * 批量创建短链接
+     * @param requestParam
+     * @return
+     */
+    ShortLinkBatchCreateRespDTO batchCreateShortLink(ShortLinkBatchCreateReqDTO requestParam);
 
     /**
      * 短链接分页查询

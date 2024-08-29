@@ -1,31 +1,30 @@
-package com.yonagi.shortlink.project.dto.req;
+package com.yonagi.shortlink.admin.remote.dto.req;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author Yonagi
  * @version 1.0
  * @program shortlink
- * @description 短链接创建请求参数
- * @date 2024/08/16 12:45
+ * @description 批量创建短链接请求参数
+ * @date 2024/08/29 10:53
  */
-
 @Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class ShortLinkCreateReqDTO {
+public class ShortLinkBatchCreateReqDTO {
 
     /**
-     * 原始链接
+     * 原始链接集合
      */
-    private String originUrl;
+    private List<String> originalUrls;
+
+    /**
+     * 描述集合
+     */
+    private List<String> describes;
 
     /**
      * 分组标识
@@ -48,8 +47,4 @@ public class ShortLinkCreateReqDTO {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date validDate;
 
-    /**
-     * 描述
-     */
-    private String describe;
 }
