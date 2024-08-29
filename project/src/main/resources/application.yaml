@@ -16,6 +16,9 @@ spring:
     view:
       prefix: /templates/
       suffix: .html
+short-link:
+  domain:
+    default: b23.link:8001
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
