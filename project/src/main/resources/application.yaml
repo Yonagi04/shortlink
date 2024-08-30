@@ -19,6 +19,14 @@ spring:
 short-link:
   domain:
     default: b23.link:8001
+  goto-domain:
+    white-list:
+      enable: true
+      names: '哔哩哔哩,Google,Github'
+      details:
+        - bilibili.com
+        - google.com
+        - github.com
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
