@@ -1,10 +1,13 @@
 package com.yonagi.shortlink.admin.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yonagi.shortlink.admin.common.biz.user.UserContext;
+import com.yonagi.shortlink.admin.common.constant.RedisCacheConstant;
+import com.yonagi.shortlink.admin.common.convention.exception.ClientException;
 import com.yonagi.shortlink.admin.common.convention.result.Result;
 import com.yonagi.shortlink.admin.dao.entity.GroupDO;
 import com.yonagi.shortlink.admin.dao.mapper.GroupMapper;
@@ -17,6 +20,9 @@ import com.yonagi.shortlink.admin.service.GroupService;
 import com.yonagi.shortlink.admin.toolkit.RandomGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,6 +41,11 @@ import java.util.Optional;
 @Slf4j
 public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implements GroupService {
 
+    private final RedissonClient redissonClient;
+
+    @Value("${short-link.group.max-num}")
+    private Integer groupCount;
+
     ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService() {};
 
     @Override
@@ -44,20 +55,33 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
 
     @Override
     public void saveGroup(String groupName, String username) {
-        String gid;
-        while (true) {
-            gid = RandomGenerator.generateRandomString();
-            if (hasGid(username, gid)) {
-                break;
+        RLock lock = redissonClient.getLock(String.format(RedisCacheConstant.LOCK_SAVE_GROUP_KEY, username));
+        lock.lock();
+        try {
+            LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.lambdaQuery(GroupDO.class)
+                    .eq(GroupDO::getUsername, username)
+                    .eq(GroupDO::getDelFlag, 0);
+            List<GroupDO> groupDOList = baseMapper.selectList(queryWrapper);
+            if (CollUtil.isNotEmpty(groupDOList) && groupDOList.size() >= groupCount) {
+                throw new ClientException("用户最多创建" + groupCount + "个短链接分组");
             }
+            String gid;
+            while (true) {
+                gid = RandomGenerator.generateRandomString();
+                if (hasGid(username, gid)) {
+                    break;
+                }
+            }
+            GroupDO groupDO = GroupDO.builder()
+                    .name(groupName)
+                    .gid(gid)
+                    .sortOrder(0)
+                    .username(username)
+                    .build();
+            baseMapper.insert(groupDO);
+        } finally {
+            lock.unlock();
         }
-        GroupDO groupDO = GroupDO.builder()
-                .name(groupName)
-                .gid(gid)
-                .sortOrder(0)
-                .username(username)
-                .build();
-        baseMapper.insert(groupDO);
     }
 
     /**

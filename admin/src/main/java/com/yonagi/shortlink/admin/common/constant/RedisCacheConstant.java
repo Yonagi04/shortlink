@@ -8,5 +8,14 @@ package com.yonagi.shortlink.admin.common.constant;
  * @date 2024/08/14 13:31
  */
 public class RedisCacheConstant {
+
+    /**
+     * 用户注册锁
+     */
     public final static String LOCK_USER_REGISTER_KEY = "short-link:lock_user-register:";
+
+    /**
+     * 用户创建分组锁
+     */
+    public final static String LOCK_SAVE_GROUP_KEY = "short-link:lock_save-group:%s";
 }
