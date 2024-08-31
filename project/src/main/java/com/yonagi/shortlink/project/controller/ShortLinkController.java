@@ -1,5 +1,6 @@
 package com.yonagi.shortlink.project.controller;
 
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yonagi.shortlink.project.common.convention.result.Result;
 import com.yonagi.shortlink.project.common.convention.result.Results;
@@ -11,6 +12,7 @@ import com.yonagi.shortlink.project.dto.resp.ShortLinkBatchCreateRespDTO;
 import com.yonagi.shortlink.project.dto.resp.ShortLinkCountQueryRespDTO;
 import com.yonagi.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
 import com.yonagi.shortlink.project.dto.resp.ShortLinkPageRespDTO;
+import com.yonagi.shortlink.project.handler.CustomBlockHandler;
 import com.yonagi.shortlink.project.service.ShortLinkService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -50,6 +52,11 @@ public class ShortLinkController {
      * @param requestParam 创建短链接请求参数
      * @return
      */
+    @SentinelResource(
+            value = "create_short-link",
+            blockHandler = "createShortLinkBlockHandler",
+            blockHandlerClass = CustomBlockHandler.class
+    )
     @PostMapping("/api/short-link/v1/create")
     public Result<ShortLinkCreateRespDTO> createShortLink(@RequestBody ShortLinkCreateReqDTO requestParam) {
         return Results.success(shortLinkService.createShortLink(requestParam));
@@ -61,6 +68,11 @@ public class ShortLinkController {
      * @return
      */
     @PostMapping("/api/short-link/v1/create/batch")
+    @SentinelResource(
+            value = "create_short-link",
+            blockHandler = "createBatchShortLinkBlockHandler",
+            blockHandlerClass = CustomBlockHandler.class
+    )
     public Result<ShortLinkBatchCreateRespDTO> batchCreateShortLink(@RequestBody ShortLinkBatchCreateReqDTO requestParam) {
         return Results.success(shortLinkService.batchCreateShortLink(requestParam));
     }
