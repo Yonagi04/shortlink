@@ -130,7 +130,7 @@ public class LinkUtil {
      * @return 原始链接的域名
      */
     public static String extractDomain(String url) {
-        if (!url.startsWith("https://") || !url.startsWith("http://")) {
+        if (!url.startsWith("https://") && !url.startsWith("http://")) {
             url = "https://" + url;
         }
         String domain = null;
