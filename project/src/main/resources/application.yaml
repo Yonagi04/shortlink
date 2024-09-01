@@ -2,6 +2,8 @@ server:
   port: 8001
 
 spring:
+  application:
+    name: short-link-project
   config:
     import: optional:classpath:/application.dev.yaml
   datasource:
@@ -16,6 +18,10 @@ spring:
     view:
       prefix: /templates/
       suffix: .html
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
 short-link:
   domain:
     default: b23.link:8001
