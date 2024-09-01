@@ -2,6 +2,7 @@ package com.yonagi.shortlink.gateway.filter;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.yonagi.shortlink.gateway.common.constant.RedisCacheConstant;
 import com.yonagi.shortlink.gateway.config.Config;
 import com.yonagi.shortlink.gateway.dto.GatewayErrorResult;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -48,7 +49,7 @@ public class TokenValidateGatewayFilterFactory extends AbstractGatewayFilterFact
                 String username = request.getHeaders().getFirst("username");
                 String token = request.getHeaders().getFirst("token");
                 Object userInfo;
-                if (StringUtils.hasText(username) && StringUtils.hasText(token) && (userInfo = stringRedisTemplate.opsForHash().get("short-link:login:" + username, token)) != null) {
+                if (StringUtils.hasText(username) && StringUtils.hasText(token) && (userInfo = stringRedisTemplate.opsForHash().get(RedisCacheConstant.USER_LOGIN_KEY + username, token)) != null) {
                     JSONObject userInfoJsonObject = JSON.parseObject(userInfo.toString());
                     ServerHttpRequest.Builder builder = exchange.getRequest().mutate().headers(httpHeaders -> {
                         httpHeaders.set("userId", userInfoJsonObject.getString("id"));

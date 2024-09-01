@@ -106,7 +106,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         if (userDO == null) {
             throw new ClientException(UserErrorCodeEnum.USER_LOGIN_ERROR);
         }
-        Map<Object, Object> hasLoginMap = stringRedisTemplate.opsForHash().entries("login_" + requestParam.getUsername());
+        Map<Object, Object> hasLoginMap = stringRedisTemplate.opsForHash().entries("short-link:login:" + requestParam.getUsername());
         if (CollUtil.isNotEmpty(hasLoginMap)) {
             stringRedisTemplate.expire("login_" + requestParam.getUsername(), 30L, TimeUnit.MINUTES);
             String token = hasLoginMap.keySet()
@@ -118,21 +118,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         }
 
         String uuid = UUID.randomUUID().toString();
-        stringRedisTemplate.opsForHash().put("login_" + requestParam.getUsername(), uuid,
+        stringRedisTemplate.opsForHash().put(RedisCacheConstant.USER_LOGIN_KEY + requestParam.getUsername(), uuid,
                 JSON.toJSONString(userDO));
-        stringRedisTemplate.expire("login_" + requestParam.getUsername(), 30L, TimeUnit.MINUTES);
+        stringRedisTemplate.expire(RedisCacheConstant.USER_LOGIN_KEY + requestParam.getUsername(), 30L, TimeUnit.MINUTES);
         return new UserLoginRespDTO(uuid);
     }
 
     @Override
     public Boolean checkLogin(String username, String token) {
-        return stringRedisTemplate.opsForHash().get("login_" + username, token) != null;
+        return stringRedisTemplate.opsForHash().get(RedisCacheConstant.USER_LOGIN_KEY + username, token) != null;
     }
 
     @Override
     public void logout(String username, String token) {
         if (checkLogin(username, token)) {
-            stringRedisTemplate.delete("login_" + username);
+            stringRedisTemplate.delete(RedisCacheConstant.USER_LOGIN_KEY + username);
         } else {
             throw new ClientException(UserErrorCodeEnum.USER_NOT_EXIST);
         }
