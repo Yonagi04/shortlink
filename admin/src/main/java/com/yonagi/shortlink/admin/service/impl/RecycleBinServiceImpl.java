@@ -9,7 +9,7 @@ import com.yonagi.shortlink.admin.common.convention.exception.ServerException;
 import com.yonagi.shortlink.admin.common.convention.result.Result;
 import com.yonagi.shortlink.admin.dao.entity.GroupDO;
 import com.yonagi.shortlink.admin.dao.mapper.GroupMapper;
-import com.yonagi.shortlink.admin.remote.ShortLinkRemoteService;
+import com.yonagi.shortlink.admin.remote.ShortLinkActualRemoteService;
 import com.yonagi.shortlink.admin.remote.dto.req.ShortLinkRecycleBinPageReqDTO;
 import com.yonagi.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
 import com.yonagi.shortlink.admin.service.RecycleBinService;
@@ -29,9 +29,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RecycleBinServiceImpl implements RecycleBinService {
 
+    private final ShortLinkActualRemoteService shortLinkActualRemoteService;
     private final GroupMapper groupMapper;
-
-    ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService() {};
 
     @Override
     public Result<IPage<ShortLinkPageRespDTO>> pageShortLinkForRecycleBin(ShortLinkRecycleBinPageReqDTO requestParam) {
@@ -43,6 +42,6 @@ public class RecycleBinServiceImpl implements RecycleBinService {
             throw new ServerException("用户无分组信息");
         }
         requestParam.setGidList(groupDOList.stream().map(GroupDO::getGid).toList());
-        return shortLinkRemoteService.pageShortLinkForRecycleBin(requestParam);
+        return shortLinkActualRemoteService.pageShortLinkForRecycleBin(requestParam);
     }
 }

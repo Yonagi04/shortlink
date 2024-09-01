@@ -14,7 +14,7 @@ import com.yonagi.shortlink.admin.dao.mapper.GroupMapper;
 import com.yonagi.shortlink.admin.dto.req.ShortLinkGroupSortReqDTO;
 import com.yonagi.shortlink.admin.dto.req.ShortLinkGroupUpdateReqDTO;
 import com.yonagi.shortlink.admin.dto.resp.ShortLinkGroupRespDTO;
-import com.yonagi.shortlink.admin.remote.ShortLinkRemoteService;
+import com.yonagi.shortlink.admin.remote.ShortLinkActualRemoteService;
 import com.yonagi.shortlink.admin.remote.dto.resp.ShortLinkCountQueryRespDTO;
 import com.yonagi.shortlink.admin.service.GroupService;
 import com.yonagi.shortlink.admin.toolkit.RandomGenerator;
@@ -41,12 +41,11 @@ import java.util.Optional;
 @Slf4j
 public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implements GroupService {
 
+    private final ShortLinkActualRemoteService actualRemoteService;
     private final RedissonClient redissonClient;
 
     @Value("${short-link.group.max-num}")
     private Integer groupCount;
-
-    ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService() {};
 
     @Override
     public void saveGroup(String groupName) {
@@ -104,7 +103,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
                 .eq(GroupDO::getUsername, UserContext.getUsername())
                 .orderByDesc(GroupDO::getSortOrder, GroupDO::getUpdateTime);
         List<GroupDO> groupDOList = baseMapper.selectList(queryWrapper);
-        Result<List<ShortLinkCountQueryRespDTO>> listResult = shortLinkRemoteService.
+        Result<List<ShortLinkCountQueryRespDTO>> listResult = actualRemoteService.
                 listGroupShortLinkCount(groupDOList.stream().map(GroupDO::getGid).toList());
         List<ShortLinkGroupRespDTO> shortLinkGroupRespDTOList = BeanUtil.copyToList(groupDOList, ShortLinkGroupRespDTO.class);
         shortLinkGroupRespDTOList.forEach(each -> {
