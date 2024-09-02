@@ -101,8 +101,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             response.sendRedirect("/page/404");
             return;
         }
-        String gotoIsNullShortLink = stringRedisTemplate.opsForValue()
-                .get(String.format(RedisKeyConstant.GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl));
+        String gotoIsNullShortLink = stringRedisTemplate.opsForValue().get(String.format(RedisKeyConstant.GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl));
         if (StrUtil.isNotBlank(gotoIsNullShortLink)) {
             response.sendRedirect("/page/404");
             return;
@@ -116,6 +115,11 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 ShortLinkStatsRecordDTO statsRecord = buildLinkStatsRecordAndSetUser(fullShortUrl, request, response);
                 shortLinkStats(fullShortUrl, null, statsRecord);
                 response.sendRedirect(originUrl);
+                return;
+            }
+            gotoIsNullShortLink = stringRedisTemplate.opsForValue().get((String.format(RedisKeyConstant.GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl));
+            if (StrUtil.isNotBlank(gotoIsNullShortLink)) {
+                response.sendRedirect("/page/404");
                 return;
             }
             LambdaQueryWrapper<ShortLinkGotoDO> linkGotoQueryWrapper = Wrappers.lambdaQuery(ShortLinkGotoDO.class)
