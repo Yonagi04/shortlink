@@ -110,7 +110,6 @@ public class ShortLinkStatsSaveConsumer implements RocketMQListener<Map<String, 
                     .hour(hour)
                     .weekday(weekValue)
                     .fullShortUrl(fullShortUrl)
-                    .gid(gid)
                     .date(new Date())
                     .build();
             linkAccessStatsMapper.shortLinkStats(linkAccessStatsDO);
