@@ -117,7 +117,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 response.sendRedirect(originUrl);
                 return;
             }
-            gotoIsNullShortLink = stringRedisTemplate.opsForValue().get((String.format(RedisKeyConstant.GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl));
+            gotoIsNullShortLink = stringRedisTemplate.opsForValue().get((String.format(RedisKeyConstant.GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl)));
             if (StrUtil.isNotBlank(gotoIsNullShortLink)) {
                 response.sendRedirect("/page/404");
                 return;
@@ -255,6 +255,9 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
              *  因此我们没必要在出现duplicateKeyException之后，再做查询操作，这样只会增加数据库压力
              *  那么接下来需要做的一个工作就是，对于已经创建过短链接的原URL，我们希望不要重复创建，因为多余的短链接会占用布隆过滤器空间
              */
+            if (!shortUriCreateCachePenetrationBloomFilter.contains(fullShortUrl)) {
+                shortUriCreateCachePenetrationBloomFilter.add(fullShortUrl);
+            }
             log.error("短链接: {}重复入库", fullShortUrl);
             throw new ServerException("短链接重复生成，请稍后再试");
         }
